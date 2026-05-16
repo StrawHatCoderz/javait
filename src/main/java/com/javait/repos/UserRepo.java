@@ -3,12 +3,14 @@ package com.javait.repos;
 import com.javait.models.Users;
 import com.javait.exceptions.UserNotFoundException;
 import com.javait.models.User;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class UserRepo {
   private final Users users;
 
-  public UserRepo(Users users) {
-    this.users = users;
+  public UserRepo() {
+    this.users = new Users();
   }
 
   public User createUser(int userId, String username, String avatarUrl) {

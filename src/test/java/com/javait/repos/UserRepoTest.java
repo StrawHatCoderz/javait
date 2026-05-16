@@ -11,7 +11,7 @@ class UserRepoTest {
 
   @Test
   void shouldCreateAUser() {
-    UserRepo userRepo = new UserRepo(new Users());
+    UserRepo userRepo = new UserRepo();
     User user = userRepo.createUser(1, "Deadpool", "http://Deadpool_url.com");
     assertEquals(1, user.userId());
     assertEquals("Deadpool", user.username());
@@ -19,7 +19,7 @@ class UserRepoTest {
 
   @Test
   void shouldFindUserByUsername() throws UserNotFoundException {
-    UserRepo userRepo = new UserRepo(new Users());
+    UserRepo userRepo = new UserRepo();
     User user = userRepo.createUser(1, "Deadpool", "http://Deadpool_url.com");
 
     assertEquals(userRepo.findUserByUsername("Deadpool"), user);
@@ -27,14 +27,14 @@ class UserRepoTest {
 
   @Test
   void shouldThrowErrorIfUserNotFoundWithGivenUsername() {
-    UserRepo userRepo = new UserRepo(new Users());
+    UserRepo userRepo = new UserRepo();
     assertThrows(UserNotFoundException.class,
             () -> userRepo.findUserByUsername("Deadpool"));
   }
 
   @Test
   void shouldFindUserById() throws UserNotFoundException {
-    UserRepo userRepo = new UserRepo(new Users());
+    UserRepo userRepo = new UserRepo();
     User user = userRepo.createUser(1, "Deadpool", "http://Deadpool_url.com");
 
     assertEquals(userRepo.findUserById(1), user);
@@ -42,14 +42,14 @@ class UserRepoTest {
 
   @Test
   void shouldThrowErrorIfUserNotFoundWithGivenId() {
-    UserRepo userRepo = new UserRepo(new Users());
+    UserRepo userRepo = new UserRepo();
     assertThrows(UserNotFoundException.class,
             () -> userRepo.findUserById(1));
   }
 
   @Test
   void shouldReturnAllUsersExcludingRequestingUser() throws UserNotFoundException {
-    UserRepo userRepo = new UserRepo(new Users());
+    UserRepo userRepo = new UserRepo();
     User requestingUser = userRepo.createUser(1, "Deadpool1", "http" +
             "://Deadpool1_url" +
             ".com");

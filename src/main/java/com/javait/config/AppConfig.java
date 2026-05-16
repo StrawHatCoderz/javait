@@ -1,7 +1,5 @@
 package com.javait.config;
 
-import com.javait.models.Users;
-import com.javait.repos.UserRepo;
 import com.javait.services.JWTService;
 import com.javait.services.TokenService;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,11 +14,6 @@ public class AppConfig {
   @Bean
   public HttpClient httpClient() {
     return HttpClient.newHttpClient();
-  }
-
-  @Bean
-  public UserRepo userRepo() {
-    return new UserRepo(new Users());
   }
 
   @Bean
