@@ -17,6 +17,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Optional;
 
 @Service
 public class AuthService {
@@ -25,16 +26,19 @@ public class AuthService {
   private final HttpClient httpClient;
   private final UserRepo userRepo;
   private final TokenService tokenService;
+  private final ObjectMapper objectMapper;
 
   public AuthService(@Value("${github.client-id}") String clientId,
                      @Value("${github.client-secret}") String clientSecret,
                      HttpClient httpClient, UserRepo userRepo,
-                     TokenService tokenService) {
+                     TokenService tokenService,
+                     ObjectMapper objectMapper) {
     this.clientId = clientId;
     this.clientSecret = clientSecret;
     this.httpClient = httpClient;
     this.userRepo = userRepo;
     this.tokenService = tokenService;
+    this.objectMapper = objectMapper;
   }
 
   public String getGithubRedirectUrl() {
@@ -47,11 +51,12 @@ public class AuthService {
 
     githubUser = this.fetchUserDetails(code);
 
-    User existing = userRepo.findUserById(githubUser.id());
-    User user = existing != null
-            ? existing
-            : userRepo.createUser(githubUser.id(), githubUser.name(), githubUser.avatarUrl());
+    Optional<User> existing = userRepo.findUserById(githubUser.id());
 
+    User user = existing.isPresent()
+            ? existing.get()
+            : userRepo.createUser(githubUser.id(), githubUser.name(), githubUser.avatarUrl()
+    );
     return tokenService.sign(new TokenPayload(user.userId(), user.username()));
   }
 
@@ -73,8 +78,6 @@ public class AuthService {
       throw new FailedToFetchUserException("Failed to fetch user details");
     }
 
-    ObjectMapper objectMapper = new ObjectMapper();
-
     return objectMapper.readValue(
             response.body(),
             GithubUser.class
@@ -82,7 +85,6 @@ public class AuthService {
   }
 
   private GithubToken fetchToken(String code) throws InterruptedException, IOException {
-
     String body = String.format(
             "client_id=%s&client_secret=%s&code=%s",
             clientId,
@@ -107,8 +109,6 @@ public class AuthService {
               "Failed to exchange code for token"
       );
     }
-
-    ObjectMapper objectMapper = new ObjectMapper();
 
     GithubToken token = objectMapper.readValue(
             response.body(),

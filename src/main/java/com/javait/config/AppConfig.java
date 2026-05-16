@@ -5,6 +5,7 @@ import com.javait.services.TokenService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import tools.jackson.databind.ObjectMapper;
 
 import java.net.http.HttpClient;
 
@@ -19,5 +20,10 @@ public class AppConfig {
   @Bean
   public TokenService tokenService(@Value("${secret.key}") String secretKey) {
     return new TokenService(JWTService.create(secretKey));
+  }
+
+  @Bean
+  public ObjectMapper objectMapper() {
+    return new ObjectMapper();
   }
 }

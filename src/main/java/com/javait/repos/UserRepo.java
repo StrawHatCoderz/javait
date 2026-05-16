@@ -4,6 +4,8 @@ import com.javait.models.Users;
 import com.javait.models.User;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public class UserRepo {
   private final Users users;
@@ -18,16 +20,12 @@ public class UserRepo {
     return user;
   }
 
-  public User findUserByUsername(String username){
-    return this.users
-            .find(username)
-            .orElse(null);
+  public Optional<User> findUserByUsername(String username){
+    return this.users.find(username);
   }
 
-  public User findUserById(int userId) {
-    return this.users
-            .find(userId)
-            .orElse(null);
+  public Optional<User> findUserById(int userId) {
+    return this.users.find(userId);
   }
 
   public Users findOthers(int userId) {

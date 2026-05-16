@@ -20,23 +20,24 @@ import java.net.URI;
 @RestController
 public class AuthController {
   private final AuthService authService;
+  private final String redirectUrl;
 
-  public AuthController(AuthService authService) {
+  public AuthController(AuthService authService,
+                        @Value("${frontend.url}") String redirectUrl) {
     this.authService = authService;
+    this.redirectUrl = redirectUrl;
   }
 
   @GetMapping("/api/login")
   public ResponseEntity<Void> redirectToGithubOAuth() {
-    String redirectUrl = authService.getGithubRedirectUrl();
+    String githubRedirectUrl = authService.getGithubRedirectUrl();
     return ResponseEntity.status(HttpStatus.FOUND)
-            .location(URI.create(redirectUrl))
+            .location(URI.create(githubRedirectUrl))
             .build();
   }
 
-
   @GetMapping("/api/post-login")
   public ResponseEntity<Object> handlePostLogin(@RequestParam String code,
-                                                @Value("${frontend.url}") String redirectUrl,
                                                 HttpServletResponse response) throws IOException, InterruptedException {
     String jwtToken = authService.loginWithGithub(code);
 
@@ -49,7 +50,7 @@ public class AuthController {
     response.addCookie(jwtCookie);
 
     return ResponseEntity.status(HttpStatus.FOUND)
-            .location(URI.create(redirectUrl))
+            .location(URI.create(this.redirectUrl))
             .build();
   }
 
