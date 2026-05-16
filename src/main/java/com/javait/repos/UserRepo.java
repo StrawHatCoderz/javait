@@ -14,20 +14,19 @@ public class UserRepo {
   public User createUser(int userId, String username, String avatarUrl) {
     User user = new User(userId, username, avatarUrl);
     this.users.add(user);
-    System.out.println(users.size());
     return user;
   }
 
-  public User findUserByUsername(String username) throws UserNotFoundException {
+  public User findUserByUsername(String username){
     return this.users
             .find(username)
-            .orElseThrow(() -> new UserNotFoundException("User not found"));
+            .orElse(null);
   }
 
-  public User findUserById(int userId) throws UserNotFoundException {
+  public User findUserById(int userId) {
     return this.users
             .find(userId)
-            .orElseThrow(() -> new UserNotFoundException("User not found"));
+            .orElse(null);
   }
 
   public Users findOthers(int userId) {
