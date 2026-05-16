@@ -128,4 +128,8 @@ public class AuthService {
 
     return token;
   }
+
+  public boolean isLoggedIn(String jwtToken) {
+    return tokenService.verify(jwtToken);
+  }
 }
