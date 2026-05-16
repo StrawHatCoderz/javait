@@ -1,7 +1,7 @@
 package com.javait.repos;
 
-import com.javait.models.Users;
 import com.javait.exceptions.UserNotFoundException;
+import com.javait.models.Users;
 import com.javait.models.User;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +18,7 @@ class UserRepoTest {
   }
 
   @Test
-  void shouldFindUserByUsername() throws UserNotFoundException {
+  void shouldFindUserByUsername() {
     UserRepo userRepo = new UserRepo();
     User user = userRepo.createUser(1, "Deadpool", "http://Deadpool_url.com");
 
@@ -33,7 +33,7 @@ class UserRepoTest {
   }
 
   @Test
-  void shouldFindUserById() throws UserNotFoundException {
+  void shouldFindUserById() {
     UserRepo userRepo = new UserRepo();
     User user = userRepo.createUser(1, "Deadpool", "http://Deadpool_url.com");
 
@@ -48,7 +48,7 @@ class UserRepoTest {
   }
 
   @Test
-  void shouldReturnAllUsersExcludingRequestingUser() throws UserNotFoundException {
+  void shouldReturnAllUsersExcludingRequestingUser() {
     UserRepo userRepo = new UserRepo();
     User requestingUser = userRepo.createUser(1, "Deadpool1", "http" +
             "://Deadpool1_url" +

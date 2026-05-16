@@ -1,9 +1,5 @@
 package com.javait.routes;
 
-import com.javait.exceptions.FailedToFetchUserException;
-import com.javait.exceptions.GithubTokenException;
-import com.javait.exceptions.InvalidCodeException;
-import com.javait.exceptions.UserNotFoundException;
 import com.javait.models.ApiError;
 import com.javait.models.ApiResponse;
 import com.javait.models.IsLoggedInResponse;
@@ -41,7 +37,7 @@ public class AuthController {
   @GetMapping("/api/post-login")
   public ResponseEntity<Object> handlePostLogin(@RequestParam String code,
                                                 @Value("${frontend.url}") String redirectUrl,
-                                                HttpServletResponse response) throws UserNotFoundException, GithubTokenException, FailedToFetchUserException, IOException, InterruptedException, InvalidCodeException {
+                                                HttpServletResponse response) throws IOException, InterruptedException {
     String jwtToken = authService.loginWithGithub(code);
 
     Cookie jwtCookie = new Cookie("token", jwtToken);

@@ -1,6 +1,6 @@
 package com.javait.exceptions;
 
-public class InvalidCodeException extends Throwable {
+public class InvalidCodeException extends RuntimeException {
   public InvalidCodeException(String message) {
     super(message);
   }

@@ -1,7 +1,6 @@
 package com.javait.repos;
 
 import com.javait.models.Users;
-import com.javait.exceptions.UserNotFoundException;
 import com.javait.models.User;
 import org.springframework.stereotype.Repository;
 

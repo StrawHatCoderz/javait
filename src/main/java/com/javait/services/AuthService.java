@@ -42,15 +42,10 @@ public class AuthService {
             "=%s", clientId);
   }
 
-  public String loginWithGithub(String code) throws GithubTokenException,
-          IOException, InterruptedException, InvalidCodeException {
+  public String loginWithGithub(String code) throws IOException, InterruptedException {
     GithubUser githubUser = null;
 
-    try {
-      githubUser = this.fetchUserDetails(code);
-    } catch (FailedToFetchUserException e) {
-      throw new RuntimeException(e);
-    }
+    githubUser = this.fetchUserDetails(code);
 
     User existing = userRepo.findUserById(githubUser.id());
     User user = existing != null
@@ -60,7 +55,7 @@ public class AuthService {
     return tokenService.sign(new TokenPayload(user.userId(), user.username()));
   }
 
-  private GithubUser fetchUserDetails(String code) throws GithubTokenException, IOException, InterruptedException, InvalidCodeException, FailedToFetchUserException {
+  private GithubUser fetchUserDetails(String code) throws IOException, InterruptedException {
     GithubToken token = this.fetchToken(code);
 
     HttpRequest request = HttpRequest.newBuilder()
@@ -86,9 +81,7 @@ public class AuthService {
     );
   }
 
-  private GithubToken fetchToken(String code)
-          throws InterruptedException,
-          InvalidCodeException, GithubTokenException, IOException {
+  private GithubToken fetchToken(String code) throws InterruptedException, IOException {
 
     String body = String.format(
             "client_id=%s&client_secret=%s&code=%s",

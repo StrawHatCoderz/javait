@@ -1,6 +1,6 @@
 package com.javait.exceptions;
 
-public class UserNotFoundException extends Throwable {
+public class UserNotFoundException extends RuntimeException {
   public UserNotFoundException(String message) {
     super(message);
   }
