@@ -2,6 +2,9 @@ package com.javait.config;
 
 import com.javait.models.Users;
 import com.javait.repos.UserRepo;
+import com.javait.services.JWTService;
+import com.javait.services.TokenService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,5 +21,10 @@ public class AppConfig {
   @Bean
   public UserRepo userRepo() {
     return new UserRepo(new Users());
+  }
+
+  @Bean
+  public TokenService tokenService(@Value("${secret.key}") String secretKey) {
+    return new TokenService(JWTService.create(secretKey));
   }
 }

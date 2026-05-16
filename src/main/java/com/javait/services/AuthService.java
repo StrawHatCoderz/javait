@@ -5,6 +5,7 @@ import com.javait.exceptions.GithubTokenException;
 import com.javait.exceptions.InvalidCodeException;
 import com.javait.models.GithubToken;
 import com.javait.models.GithubUser;
+import com.javait.models.TokenPayload;
 import com.javait.models.User;
 import com.javait.repos.UserRepo;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,14 +24,17 @@ public class AuthService {
   private final String clientSecret;
   private final HttpClient httpClient;
   private final UserRepo userRepo;
+  private final TokenService tokenService;
 
   public AuthService(@Value("${github.client-id}") String clientId,
                      @Value("${github.client-secret}") String clientSecret,
-                     HttpClient httpClient, UserRepo userRepo) {
+                     HttpClient httpClient, UserRepo userRepo,
+                     TokenService tokenService) {
     this.clientId = clientId;
     this.clientSecret = clientSecret;
     this.httpClient = httpClient;
     this.userRepo = userRepo;
+    this.tokenService = tokenService;
   }
 
   public String getGithubRedirectUrl() {
@@ -38,7 +42,7 @@ public class AuthService {
             "=%s", clientId);
   }
 
-  public User loginWithGithub(String code) throws GithubTokenException,
+  public String loginWithGithub(String code) throws GithubTokenException,
           IOException, InterruptedException, InvalidCodeException {
     GithubUser githubUser = null;
 
@@ -49,9 +53,11 @@ public class AuthService {
     }
 
     User existing = userRepo.findUserById(githubUser.id());
-    return existing != null
+    User user = existing != null
             ? existing
             : userRepo.createUser(githubUser.id(), githubUser.name(), githubUser.avatarUrl());
+
+    return tokenService.sign(new TokenPayload(user.userId(), user.username()));
   }
 
   private GithubUser fetchUserDetails(String code) throws GithubTokenException, IOException, InterruptedException, InvalidCodeException, FailedToFetchUserException {
