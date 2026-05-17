@@ -12,7 +12,6 @@ public class Users extends ArrayList<User> {
 
   public Optional<User> find(String username) {
     return this.stream().filter(user -> user.username().equals(username)).findFirst();
-
   }
 
   public Optional<User> find(int userId) {

@@ -20,7 +20,7 @@ public class UserRepo {
     return user;
   }
 
-  public Optional<User> findUserByUsername(String username){
+  public Optional<User> findUserByUsername(String username) {
     return this.users.find(username);
   }
 

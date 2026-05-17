@@ -1,9 +1,10 @@
 package com.javait.repos;
 
-import com.javait.exceptions.UserNotFoundException;
 import com.javait.models.Users;
 import com.javait.models.User;
 import org.junit.jupiter.api.Test;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,14 +23,7 @@ class UserRepoTest {
     UserRepo userRepo = new UserRepo();
     User user = userRepo.createUser(1, "Deadpool", "http://Deadpool_url.com");
 
-    assertEquals(userRepo.findUserByUsername("Deadpool"), user);
-  }
-
-  @Test
-  void shouldThrowErrorIfUserNotFoundWithGivenUsername() {
-    UserRepo userRepo = new UserRepo();
-    assertThrows(UserNotFoundException.class,
-            () -> userRepo.findUserByUsername("Deadpool"));
+    assertEquals(userRepo.findUserByUsername("Deadpool"), Optional.of(user));
   }
 
   @Test
@@ -37,14 +31,7 @@ class UserRepoTest {
     UserRepo userRepo = new UserRepo();
     User user = userRepo.createUser(1, "Deadpool", "http://Deadpool_url.com");
 
-    assertEquals(userRepo.findUserById(1), user);
-  }
-
-  @Test
-  void shouldThrowErrorIfUserNotFoundWithGivenId() {
-    UserRepo userRepo = new UserRepo();
-    assertThrows(UserNotFoundException.class,
-            () -> userRepo.findUserById(1));
+    assertEquals(userRepo.findUserById(1), Optional.of(user));
   }
 
   @Test

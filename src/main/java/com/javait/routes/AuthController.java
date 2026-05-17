@@ -4,6 +4,7 @@ import com.javait.models.ApiError;
 import com.javait.models.ApiResponse;
 import com.javait.models.IsLoggedInResponse;
 import com.javait.services.AuthService;
+import com.javait.services.GithubOAuthService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,17 +21,20 @@ import java.net.URI;
 @RestController
 public class AuthController {
   private final AuthService authService;
+  private final GithubOAuthService oAuthService;
   private final String redirectUrl;
 
   public AuthController(AuthService authService,
+                        GithubOAuthService oAuthService,
                         @Value("${frontend.url}") String redirectUrl) {
     this.authService = authService;
+    this.oAuthService = oAuthService;
     this.redirectUrl = redirectUrl;
   }
 
   @GetMapping("/api/login")
   public ResponseEntity<Void> redirectToGithubOAuth() {
-    String githubRedirectUrl = authService.getGithubRedirectUrl();
+    String githubRedirectUrl = oAuthService.getGithubRedirectUrl();
     return ResponseEntity.status(HttpStatus.FOUND)
             .location(URI.create(githubRedirectUrl))
             .build();
