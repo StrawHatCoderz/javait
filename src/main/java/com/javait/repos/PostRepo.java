@@ -1,16 +1,12 @@
 package com.javait.repos;
 
 import com.javait.exceptions.PostNotFoundException;
-import com.javait.models.Post;
-import com.javait.models.Posts;
-import com.javait.models.Subscription;
-import com.javait.models.Subscriptions;
+import com.javait.models.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 

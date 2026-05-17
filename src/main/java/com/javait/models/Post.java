@@ -1,6 +1,8 @@
 package com.javait.models;
 
+import java.util.Date;
+
 public record Post(int postId, int authorId, String title,
-                   String content, java.util.Date postedOn,
-                   com.javait.repos.Likes likes) {
+                   String content, Date postedOn,
+                   Likes likes) {
 }

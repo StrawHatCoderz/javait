@@ -3,11 +3,14 @@ package com.javait.filters;
 import com.javait.context.UserContext;
 import com.javait.exceptions.CookieNotFoundException;
 import com.javait.exceptions.TokenNotFoundException;
+import com.javait.models.TokenPayload;
+import com.javait.models.User;
 import com.javait.services.AuthService;
 import com.javait.utils.CookieParser;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -32,20 +35,19 @@ public class AuthenticationFilter extends OncePerRequestFilter {
                 "Unauthorized Access");
         return;
       }
-
-      UserContext.setUser(extractUserId(token), extractUsername(token));
+      TokenPayload payload = extractPayload(token);
+      UserContext.setUser(payload.userId(), payload.username());
 
       filterChain.doFilter(request, response);
     } catch (CookieNotFoundException | TokenNotFoundException e) {
       response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+    } finally {
+      UserContext.clear();
     }
   }
 
-  private String extractUsername(String token) {
-    return authService.getCurrentSessionUser(token).get().username();
-  }
-
-  private int extractUserId(String token) {
-    return authService.getCurrentSessionUser(token).get().userId();
+  private @NonNull TokenPayload extractPayload(String token) throws TokenNotFoundException {
+    return authService.getCurrentSessionUser(token)
+            .orElseThrow(() -> new TokenNotFoundException("Invalid token"));
   }
 }

@@ -1,4 +1,4 @@
-package com.javait.repos;
+package com.javait.models;
 
 import java.util.ArrayList;
 
