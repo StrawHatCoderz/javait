@@ -47,16 +47,16 @@ public class AuthService {
   }
 
   public String loginWithGithub(String code) throws IOException, InterruptedException {
-    GithubUser githubUser = null;
-
-    githubUser = this.fetchUserDetails(code);
+    GithubUser githubUser = this.fetchUserDetails(code);
 
     Optional<User> existing = userRepo.findUserById(githubUser.id());
 
-    User user = existing.isPresent()
-            ? existing.get()
-            : userRepo.createUser(githubUser.id(), githubUser.name(), githubUser.avatarUrl()
-    );
+    User user = existing.orElseGet(() -> userRepo.createUser(
+            githubUser.id(),
+            githubUser.name(),
+            githubUser.avatarUrl()
+    ));
+
     return tokenService.sign(new TokenPayload(user.userId(), user.username()));
   }
 
