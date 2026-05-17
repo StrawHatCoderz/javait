@@ -1,5 +1,6 @@
 package com.javait.filters;
 
+import com.javait.context.UserContext;
 import com.javait.exceptions.CookieNotFoundException;
 import com.javait.exceptions.TokenNotFoundException;
 import com.javait.services.AuthService;
@@ -8,11 +9,13 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
-public class AuthenticationFilter implements Filter {
+public class AuthenticationFilter extends OncePerRequestFilter {
   private final AuthService authService;
 
   public AuthenticationFilter(AuthService authService) {
@@ -20,23 +23,25 @@ public class AuthenticationFilter implements Filter {
   }
 
   @Override
-  public void doFilter(ServletRequest request, ServletResponse response,
-                       FilterChain chain) throws IOException,
-          ServletException {
-    HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-    HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
     try {
-      String token = CookieParser.parseJwtToken(httpServletRequest.getCookies());
+      String token = CookieParser.parseJwtToken(request.getCookies());
       if (!authService.isLoggedIn(token)) {
-        httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
                 "Unauthorized Access");
         return;
       }
 
-      chain.doFilter(request, response);
+      UserContext.setUserId(extractUserId(token));
+
+      filterChain.doFilter(request, response);
     } catch (CookieNotFoundException | TokenNotFoundException e) {
-      httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+      response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
     }
+  }
+
+  private int extractUserId(String token) {
+    return authService.getCurrentSessionUser(token).get().userId();
   }
 }

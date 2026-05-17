@@ -24,6 +24,10 @@ public class AuthService {
     this.oAuthService = oAuthService;
   }
 
+  public Optional<TokenPayload> getCurrentSessionUser(String token) {
+    return tokenService.parse(token);
+  }
+
   public String loginWithGithub(String code) throws IOException, InterruptedException {
     GithubUser githubUser = oAuthService.fetchUserDetails(code);
 

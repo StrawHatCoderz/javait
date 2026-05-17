@@ -10,7 +10,7 @@ public record ApiResponse<T>(
     return new ApiResponse<>(true, data, null);
   }
 
-  public static ApiResponse<IsLoggedInResponse> error(ApiError error) {
+  public static <T>ApiResponse<T> error(ApiError error) {
     return new ApiResponse<>(false, null, error);
   }
 }

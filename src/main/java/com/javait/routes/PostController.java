@@ -1,10 +1,10 @@
 package com.javait.routes;
 
-import com.javait.models.ApiResponse;
-import com.javait.models.CreatePostPayload;
-import com.javait.models.Post;
-import com.javait.models.PostCreationResponse;
+import com.javait.context.UserContext;
+import com.javait.exceptions.InvalidPostCreationException;
+import com.javait.models.*;
 import com.javait.services.PostService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,9 +19,14 @@ public class PostController {
   }
 
   @PostMapping("/api/post/create")
-  public ResponseEntity<ApiResponse<PostCreationResponse>> handleCreatePost(@RequestBody CreatePostPayload createPostPayload) {
-    Post newPost = postService.create(createPostPayload.title(), createPostPayload.content());
-
-    return ResponseEntity.status(200).build();
+  public ResponseEntity<ApiResponse<Post>> handleCreatePost(@RequestBody CreatePostPayload createPostPayload) {
+    try {
+      Post newPost = postService.create(UserContext.getUserId(), createPostPayload.title(), createPostPayload.content());
+      return ResponseEntity.ok(ApiResponse.success(newPost));
+    } catch (InvalidPostCreationException e) {
+      return ResponseEntity
+              .status(HttpStatus.BAD_REQUEST)
+              .body(ApiResponse.error(new ApiError("BAD DATA", e.getMessage())));
+    }
   }
 }

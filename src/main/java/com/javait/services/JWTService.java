@@ -1,6 +1,7 @@
 package com.javait.services;
 
 import com.javait.models.TokenPayload;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -8,6 +9,7 @@ import io.jsonwebtoken.security.Keys;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.util.Optional;
 
 public class JWTService implements TokenProvider {
 
@@ -31,24 +33,38 @@ public class JWTService implements TokenProvider {
 
     return Jwts.builder()
             .setSubject(tokenPayload.username())
-            .setId(String.valueOf(tokenPayload.userId()))
+            .claim("userId", tokenPayload.userId())
             .signWith(key, SignatureAlgorithm.HS256)
             .compact();
   }
 
   @Override
-  public boolean verify(String token) {
+  public Optional<TokenPayload> parse(String token) {
 
     try {
-      Jwts.parser()
+
+      Claims claims = Jwts.parser()
               .setSigningKey(key)
               .build()
-              .parseClaimsJws(token);
+              .parseClaimsJws(token)
+              .getBody();
 
-      return true;
+      String username = claims.getSubject();
+
+      Integer userId = claims.get("userId", Integer.class);
+
+      TokenPayload payload = new TokenPayload(userId, username);
+
+      return Optional.of(payload);
 
     } catch (JwtException e) {
-      return false;
+
+      return Optional.empty();
     }
+  }
+
+  @Override
+  public boolean verify(String token) {
+    return parse(token).isPresent();
   }
 }
