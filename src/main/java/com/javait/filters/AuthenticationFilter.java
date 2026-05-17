@@ -33,12 +33,16 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         return;
       }
 
-      UserContext.setUserId(extractUserId(token));
+      UserContext.setUser(extractUserId(token), extractUsername(token));
 
       filterChain.doFilter(request, response);
     } catch (CookieNotFoundException | TokenNotFoundException e) {
       response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
     }
+  }
+
+  private String extractUsername(String token) {
+    return authService.getCurrentSessionUser(token).get().username();
   }
 
   private int extractUserId(String token) {
