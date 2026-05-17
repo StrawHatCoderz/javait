@@ -37,7 +37,7 @@ public class GithubOAuthService {
   }
 
   public GithubUser fetchUserDetails(String code) throws IOException, InterruptedException {
-    GithubToken token = this.fetchToken(code);
+    GithubToken token = this.exchangeToken(code);
 
     HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create("https://api.github.com/user"))
@@ -60,7 +60,7 @@ public class GithubOAuthService {
     );
   }
 
-  private GithubToken fetchToken(String code) throws InterruptedException, IOException {
+  private GithubToken exchangeToken(String code) throws InterruptedException, IOException {
     String body = String.format(
             "client_id=%s&client_secret=%s&code=%s",
             clientId,
