@@ -1,10 +1,13 @@
 package com.javait.routes;
 
+import com.javait.exceptions.CookieNotFoundException;
+import com.javait.exceptions.TokenNotFoundException;
 import com.javait.models.ApiError;
 import com.javait.models.ApiResponse;
 import com.javait.models.IsLoggedInResponse;
 import com.javait.services.AuthService;
 import com.javait.services.GithubOAuthService;
+import com.javait.utils.CookieParser;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -62,29 +65,15 @@ public class AuthController {
   public ResponseEntity<ApiResponse<IsLoggedInResponse>>
   serveIsLoggedIn(HttpServletRequest request) {
 
-    Cookie[] cookies = request.getCookies();
-
-    if (cookies == null) {
-
+    try {
+      String jwtToken = CookieParser.parseJwtToken(request.getCookies());
+      boolean isLoggedIn = authService.isLoggedIn(jwtToken);
+      IsLoggedInResponse response = new IsLoggedInResponse(isLoggedIn);
+      return ResponseEntity.ok(ApiResponse.success(response));
+    } catch (CookieNotFoundException | TokenNotFoundException e) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-              .body(ApiResponse.error(new ApiError("AUTH", "No cookies found")));
+              .body(ApiResponse.error(new ApiError("AUTH", e.getMessage())));
     }
 
-    for (Cookie cookie : cookies) {
-
-      if (cookie.getName().equals("token")) {
-
-        String jwtToken = cookie.getValue();
-
-        boolean isLoggedIn = authService.isLoggedIn(jwtToken);
-
-        IsLoggedInResponse response = new IsLoggedInResponse(isLoggedIn);
-
-        return ResponseEntity.ok(ApiResponse.success(response));
-      }
-    }
-
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-            .body(ApiResponse.error(new ApiError("AUTH", "Token Not Found")));
   }
 }
