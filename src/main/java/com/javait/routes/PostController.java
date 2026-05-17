@@ -44,7 +44,7 @@ public class PostController {
   }
 
   @PostMapping("/api/post/like/{postId}")
-  public ResponseEntity<ApiResponse<?>> handleLikeOnPost(
+  public ResponseEntity<ApiResponse<PostReaction>> handleLikeOnPost(
           @PathVariable int postId) {
     boolean liked = false;
     try {
