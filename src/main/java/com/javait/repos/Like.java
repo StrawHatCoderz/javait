@@ -1,4 +1,5 @@
 package com.javait.repos;
 
-public class Like {
+public record Like(int userId) {
+
 }

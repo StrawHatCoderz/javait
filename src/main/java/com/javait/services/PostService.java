@@ -1,6 +1,7 @@
 package com.javait.services;
 
 import com.javait.exceptions.InvalidPostCreationException;
+import com.javait.exceptions.PostNotFoundException;
 import com.javait.models.Post;
 import com.javait.repos.PostRepo;
 import org.springframework.stereotype.Service;
@@ -19,5 +20,13 @@ public class PostService {
     }
 
     return postRepo.createPost(authorId, title, content);
+  }
+
+  public boolean delete(int postId, int userId) {
+    return postRepo.deletePost(postId, userId);
+  }
+
+  public boolean toggleLike(int postId, int userId) throws PostNotFoundException {
+    return postRepo.toggleLike(postId, userId);
   }
 }
