@@ -3,7 +3,7 @@ package com.javait.services;
 import com.javait.models.GithubUser;
 import com.javait.models.TokenPayload;
 import com.javait.models.User;
-import com.javait.repos.UserRepo;
+import com.javait.repository.memory.InMemoryUserRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,16 +17,16 @@ class AuthServiceTest {
   private AuthService authService;
   private TokenService mockedTokenService;
   private GithubOAuthService mockedGithubOAuthService;
-  private UserRepo mockedUserRepo;
+  private InMemoryUserRepositoryImpl mockedInMemoryUserRepositoryImpl;
 
   @BeforeEach
   void setup() {
     mockedTokenService = mock(TokenService.class);
-    mockedUserRepo = mock(UserRepo.class);
+    mockedInMemoryUserRepositoryImpl = mock(InMemoryUserRepositoryImpl.class);
     mockedGithubOAuthService =
             mock(GithubOAuthService.class);
 
-    authService = new AuthService(mockedTokenService, mockedUserRepo, mockedGithubOAuthService);
+    authService = new AuthService(mockedTokenService, mockedInMemoryUserRepositoryImpl, mockedGithubOAuthService);
   }
 
   @Test
@@ -39,7 +39,7 @@ class AuthServiceTest {
                     "sampleUrl"
             ));
 
-    when(mockedUserRepo.findUserById(1)).thenReturn(Optional.of(new User(1, "deadpool",
+    when(mockedInMemoryUserRepositoryImpl.findById(1)).thenReturn(Optional.of(new User(1, "deadpool",
             "sampleUrl")));
 
     when(mockedTokenService.sign(new TokenPayload(1, "deadpool"))).thenReturn("sample-jwt-token");

@@ -4,7 +4,6 @@ import com.javait.context.UserContext;
 import com.javait.exceptions.CookieNotFoundException;
 import com.javait.exceptions.TokenNotFoundException;
 import com.javait.models.TokenPayload;
-import com.javait.models.User;
 import com.javait.services.AuthService;
 import com.javait.utils.CookieParser;
 import jakarta.servlet.*;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Optional;
 
 @Component
 public class AuthenticationFilter extends OncePerRequestFilter {

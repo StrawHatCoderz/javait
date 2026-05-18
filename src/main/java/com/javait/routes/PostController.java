@@ -1,6 +1,7 @@
 package com.javait.routes;
 
 import com.javait.context.UserContext;
+import com.javait.exceptions.InvalidAccessToDeleteException;
 import com.javait.exceptions.InvalidPostCreationException;
 import com.javait.exceptions.PostNotFoundException;
 import com.javait.models.*;
@@ -39,8 +40,17 @@ public class PostController {
   @PostMapping("/api/post/delete/{postId}")
   public ResponseEntity<ApiResponse<PostDeletion>> handleDeletePost(
           @PathVariable int postId) {
-    boolean deleted = postService.delete(postId, UserContext.getUserId());
-    return ResponseEntity.ok(ApiResponse.success(new PostDeletion(deleted)));
+
+    try {
+      boolean deleted = postService.delete(postId, UserContext.getUserId());
+      return ResponseEntity.ok(ApiResponse.success(new PostDeletion(deleted)));
+    } catch (PostNotFoundException | InvalidAccessToDeleteException e) {
+      return ResponseEntity
+              .status(HttpStatus.BAD_REQUEST)
+              .body(ApiResponse.error(
+                      new ApiError("BAD DATA", e.getMessage()))
+              );
+    }
   }
 
   @PostMapping("/api/post/like/{postId}")

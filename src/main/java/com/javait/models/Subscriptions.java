@@ -1,8 +1,8 @@
 package com.javait.models;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class Subscriptions extends ArrayList<Subscription> {
   public boolean isSubscribed(int targetId, int actorId) {
@@ -24,10 +24,10 @@ public class Subscriptions extends ArrayList<Subscription> {
     return subscriptionToRemove.map(super::remove).orElse(true);
   }
 
-  public Subscriptions mySubscriptions(int actorId) {
+  public List<Subscription> mySubscriptions(int actorId) {
     return this.stream()
             .filter(subscription ->
                     subscription.actorId() == actorId)
-            .collect(Collectors.toCollection(Subscriptions::new));
+            .toList();
   }
 }

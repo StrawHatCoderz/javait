@@ -1,36 +1,42 @@
 package com.javait.services;
 
 import com.javait.models.*;
-import com.javait.repos.PostRepo;
-import com.javait.repos.SubscriptionRepo;
+import com.javait.repository.PostRepository;
+import com.javait.repository.SubscriptionRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
 public class FeedService {
-  private final SubscriptionRepo subscriptionRepo;
-  private final PostRepo postRepo;
+  private final SubscriptionRepository subscriptionRepository;
+  private final PostRepository postRepository;
 
-  public FeedService(SubscriptionRepo subscriptionRepo, PostRepo postRepo) {
-    this.subscriptionRepo = subscriptionRepo;
-    this.postRepo = postRepo;
+  public FeedService(SubscriptionRepository subscriptionRepository,
+                     PostRepository postRepository) {
+    this.subscriptionRepository = subscriptionRepository;
+    this.postRepository = postRepository;
   }
 
   public Feed getFeedForUser(int userId) {
 
-    Subscriptions subscriptions =
-            subscriptionRepo.getAllSubscribedUser(userId);
+    List<Subscription> subscriptions =
+            subscriptionRepository.findSubscriptionsOf(userId);
 
     Stream<FeedPost> myPosts =
-            postRepo.myPosts(userId)
+            postRepository.findByAuthorId(userId)
                     .stream()
                     .map(post -> toFeedPost(post, true));
 
+    List<Integer> authorIds =
+            subscriptions.stream().map(Subscription::targetId).toList();
+
     Stream<FeedPost> subscribedPosts =
-            postRepo.getUserFeed(subscriptions)
+            postRepository.findFeedPosts(authorIds)
+                    .stream()
                     .map(post -> toFeedPost(post, false));
 
     return Stream.concat(myPosts, subscribedPosts)

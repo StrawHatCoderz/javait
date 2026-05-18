@@ -3,55 +3,49 @@ package com.javait.services;
 import com.javait.exceptions.InvalidSubscriptionException;
 import com.javait.exceptions.SelfSubscriptionException;
 import com.javait.exceptions.UserNotFoundException;
-import com.javait.models.User;
-import com.javait.repos.SubscriptionRepo;
-import com.javait.repos.UserRepo;
+import com.javait.repository.SubscriptionRepository;
+import com.javait.repository.UserRepository;
+import com.javait.repository.memory.InMemoryUserRepositoryImpl;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class SubscriptionService {
-  private final UserRepo userRepo;
-  private final SubscriptionRepo subscriptionRepo;
 
-  public SubscriptionService(UserRepo userRepo, SubscriptionRepo subscriptionRepo) {
-    this.userRepo = userRepo;
-    this.subscriptionRepo = subscriptionRepo;
+  private final UserRepository userRepository;
+  private final SubscriptionRepository subscriptionRepository;
+
+  public SubscriptionService(InMemoryUserRepositoryImpl userRepository,
+                             SubscriptionRepository subscriptionRepository) {
+    this.userRepository = userRepository;
+    this.subscriptionRepository = subscriptionRepository;
   }
 
-  public boolean subscribe(int actorId, int targetId) throws
-          SelfSubscriptionException,
-          UserNotFoundException,
-          InvalidSubscriptionException {
+  public boolean subscribe(int actorId, int targetId) throws SelfSubscriptionException, UserNotFoundException, InvalidSubscriptionException {
 
-    if (targetId == actorId) {
+    if (actorId == targetId) {
       throw new SelfSubscriptionException("You can't subscribe yourself");
     }
 
-    Optional<User> target = userRepo.findUserById(targetId);
+    userRepository.findById(targetId)
+            .orElseThrow(
+                    () -> new UserNotFoundException("Invalid user to subscribe")
+            );
 
-    if (target.isEmpty()) {
-      throw new UserNotFoundException("Invalid User To subscribe");
-    }
-
-    if (subscriptionRepo.alreadySubscribed(actorId, targetId)) {
+    if (subscriptionRepository.exists(actorId, targetId)) {
       throw new InvalidSubscriptionException("Already subscribed");
     }
 
-    return subscriptionRepo.subscribe(actorId, targetId);
+    return subscriptionRepository.save(actorId, targetId);
   }
 
-  public boolean unsubscribe(int actorId, int targetId) throws InvalidSubscriptionException, UserNotFoundException {
-    Optional<User> target = userRepo.findUserById(targetId);
+  public boolean unsubscribe(int actorId, int targetId) throws UserNotFoundException, InvalidSubscriptionException {
 
-    if (target.isEmpty()) {
-      throw new UserNotFoundException("Invalid User To unsubscribe");
+    userRepository.findById(targetId).orElseThrow(() -> new UserNotFoundException("Invalid user"));
+
+    if (!subscriptionRepository.exists(actorId, targetId)) {
+      throw new InvalidSubscriptionException("You are not subscribed");
     }
 
-    if (!subscriptionRepo.alreadySubscribed(actorId, targetId)) {
-      throw new InvalidSubscriptionException("You can't unsubscribe");
-    }
-    return subscriptionRepo.unSubscribe(actorId, targetId);
+    return subscriptionRepository.delete(actorId, targetId);
   }
 }

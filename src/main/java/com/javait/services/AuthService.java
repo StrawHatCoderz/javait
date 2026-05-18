@@ -4,7 +4,7 @@ import com.javait.models.GithubUser;
 import com.javait.models.TokenPayload;
 import com.javait.models.User;
 
-import com.javait.repos.UserRepo;
+import com.javait.repository.UserRepository;
 
 import org.springframework.stereotype.Service;
 
@@ -13,13 +13,14 @@ import java.util.Optional;
 
 @Service
 public class AuthService {
-  private final UserRepo userRepo;
+  private final UserRepository userRepository;
   private final TokenService tokenService;
   private final GithubOAuthService oAuthService;
 
-  public AuthService(TokenService tokenService, UserRepo userRepo,
+  public AuthService(TokenService tokenService,
+                     UserRepository userRepository,
                      GithubOAuthService oAuthService) {
-    this.userRepo = userRepo;
+    this.userRepository = userRepository;
     this.tokenService = tokenService;
     this.oAuthService = oAuthService;
   }
@@ -31,13 +32,14 @@ public class AuthService {
   public String loginWithGithub(String code) throws IOException, InterruptedException {
     GithubUser githubUser = oAuthService.fetchUserDetails(code);
 
-    Optional<User> existing = userRepo.findUserById(githubUser.id());
+    Optional<User> existing = userRepository.findById(githubUser.id());
 
-    User user = existing.orElseGet(() -> userRepo.createUser(
-            githubUser.id(),
-            githubUser.name(),
-            githubUser.avatarUrl()
-    ));
+    User user = existing.orElseGet(() -> userRepository
+                    .save(new User(
+                            githubUser.id(),
+                            githubUser.name(),
+                            githubUser.avatarUrl())
+                    ));
 
     return tokenService.sign(new TokenPayload(user.userId(), user.username()));
   }
