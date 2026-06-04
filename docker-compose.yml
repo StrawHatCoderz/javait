@@ -1,0 +1,56 @@
+version: "3.9"
+
+services:
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "8000:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - app1
+      - app2
+      - app3
+
+  app1:
+    build: .
+    container_name: app1
+    environment:
+      SECRET_KEY: ${SECRET_KEY}
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+      FRONTEND_URL: ${FRONTEND_URL}
+      SPRING_DATA_MONGODB_URI: ${MONGO_URL}
+
+  app2:
+    build: .
+    container_name: app2
+    environment:
+      SECRET_KEY: ${SECRET_KEY}
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+      FRONTEND_URL: ${FRONTEND_URL}
+      SPRING_DATA_MONGODB_URI: ${MONGO_URL}
+
+  app3:
+    build: .
+    container_name: app3
+    environment:
+      SECRET_KEY: ${SECRET_KEY}
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+      FRONTEND_URL: ${FRONTEND_URL}
+      SPRING_DATA_MONGODB_URI: ${MONGO_URL}
+
+  mongo:
+    image: mongo:7
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
